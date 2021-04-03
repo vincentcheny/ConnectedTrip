@@ -84,10 +84,6 @@
 
     <v-main>
       <v-container>
-        <v-row>
-          <router-link to="/one">显示第一个页面</router-link>
-          <router-link to="/two">显示第二个页面</router-link>
-        </v-row>
         <router-view></router-view>
       </v-container>
     </v-main>
