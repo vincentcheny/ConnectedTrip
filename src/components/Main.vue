@@ -105,15 +105,56 @@
               </div>
             </v-card-text>
             <v-col>
+              <v-row>
+                <v-col class="my-n5" cols="11">
+                  <v-text-field
+                    label="Other requirements"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="1">
+                  <v-btn
+                    small
+                    color="red lighten-3"
+                    text
+                    dark
+                    @click.stop="APIDialog = true"
+                  >
+                    API
+                  </v-btn>
+                  <v-dialog
+                    v-model="APIDialog"
+                    :max-width="APIDialogWidth"
+                  >
+                    <v-card>
+                      <v-card-title v-html="APIIntroTitle">
+                      </v-card-title>
+                      <v-card-text v-html="APIIntroContent">
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="grey lighten-1"
+                          text
+                          @click="APIDialog = false"
+                        >
+                          Close
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col>
               <v-progress-linear
-              color="light-blue"
-              height="15"
-              v-model="progressVal"
-              striped
-              rounded
-            >
-              <strong>{{ Math.ceil(progressVal) }}%</strong>
-            </v-progress-linear>
+                color="light-blue"
+                height="15"
+                v-model="progressVal"
+                striped
+                rounded
+              >
+                <strong>{{ Math.ceil(progressVal) }}%</strong>
+              </v-progress-linear>
             </v-col>
             <v-card-actions>
               <v-btn
@@ -255,6 +296,10 @@ export default {
           isSlider: true,
         }
       ],
+      APIDialog: false,
+      APIDialogWidth: 500,
+      APIIntroTitle: 'Introduction to Yonder Keyword Extraction',
+      APIIntroContent: 'Here is the feature provided by <i>Yonder Keyword Extraction</i>.',
       cardImg: [
         'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
         'https://cdn.vuetifyjs.com/images/cards/cooking.png',

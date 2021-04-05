@@ -1,29 +1,29 @@
 <template>
   <div>
-    <v-row v-for='r in getDayRow()' :key='r' :id='r'>
-        <v-col v-for='n in getDayCol(r)' :key='n' :cols='3' v-once>
+    <v-row>
+        <v-col v-for='n in numDays' :key='n' :cols='3' v-show="isShowDay[n - 1]">
             <v-hover v-slot='{ hover }'>
                 <v-card class='mx-auto' max-width='400' :elevation='hover ? 12 : 2'>
                 <v-card>
                     <v-img
                     class="white--text align-end"
-                    :src='cardImg[2 * r + n - 3]'
+                    :src='cardImg[n % cardImg.length]'
                     :gradient='getGradient(hover)'
                     height='250'
                     >
-                        <v-card-title><h2> Day {{ 2 * r + n - 2 }} </h2></v-card-title>
+                        <v-card-title><h2> Day {{ n }} </h2></v-card-title>
                     </v-img>
                 </v-card>
                 <v-card-text class='py-0'>
                     <v-timeline align-top dense>
-                    <v-timeline-item v-for='i in 6' :key='i' :color='getTimelineColor(r, n, i)' small>
+                    <v-timeline-item v-for='i in 6' :key='i' :color='getTimelineColor(n, i)' small>
                         <v-row class='pt-1'>
                         <v-col cols='4'>
-                            <strong v-text='getTime(r, n, i, 6)'></strong>
+                            <strong v-text='getTime(n, i, 6)'></strong>
                         </v-col>
-                        <v-col @click="nextIntro(r, n, i)">
-                            <strong><div v-text='getRandomTitle(r, n, i-1)'></div> </strong>
-                            <div class='caption' v-text='getRandomContent(r, n, i-1)'></div>
+                        <v-col @click="nextIntro(n, i)">
+                            <strong><div v-text='getRandomContent(n, i-1, "title")'></div> </strong>
+                            <div class='caption' v-text='getRandomContent(n, i-1, "content")'></div>
                         </v-col>
                         </v-row>
                     </v-timeline-item>
@@ -32,23 +32,16 @@
                 </v-card>
             </v-hover>
         </v-col>
-        <v-col cols='6'>
-            <div v-for='n in 3' :key='n' v-show="isShow[n - 1] && r == 1">
+        <v-col cols='3'>
+            <div v-for='n in 3' :key='n' v-show="isShowCard[n - 1]">
                 <v-card
                 :loading="loading"
                 >
-                    <template slot="progress">
-                        <v-progress-linear
-                        color="deep-purple"
-                        height="10"
-                        indeterminate
-                        ></v-progress-linear>
-                    </template>
                     <v-img
                         height="250"
                         :src="cardImg[n]"
                     ></v-img>
-                    <v-card-title v-text='getRandomTitle(0,0,n)'></v-card-title>
+                    <v-card-title v-text='getRandomContent(0, n, "title")'></v-card-title>
                     <v-card-text>
                         <v-row
                         align="center"
@@ -68,7 +61,7 @@
                         <div class="my-4 subtitle-1">
                         $ • Tyeery, Dto
                         </div>
-                        <div v-text='getRandomContent(0, 0, n)'></div>
+                        <div v-text='getRandomContent(0, n, "content")'></div>
                     </v-card-text>
                     <v-divider class="mx-4"></v-divider>
                     <v-card-title>Availability on the day</v-card-title>
@@ -85,23 +78,44 @@
                     </v-card-text>
                     <v-card-actions>
                         <v-btn
-                        color="deep-purple lighten-2"
-                        text
-                        @click="reserve"
+                          color="deep-purple lighten-3"
+                          text
+                          @click="triggerDialog(2)"
                         >
-                            Reserve
+                          Reserve
+                          <v-dialog
+                            v-model="dialog[2]"
+                            hide-overlay
+                            persistent
+                            width="400"
+                          >
+                            <v-card
+                              color="deep-purple lighten-2"
+                              dark
+                              class="pt-2"
+                            >
+                              <v-card-text>
+                                <div style="color:white" v-html='btnMsg[2]'></div>
+                                <v-progress-linear
+                                  indeterminate
+                                  color="white"
+                                  class="mb-0"
+                                ></v-progress-linear>
+                              </v-card-text>
+                            </v-card>
+                          </v-dialog>
                         </v-btn>
                         <v-btn
-                        color="orange lighten-2"
-                        text
-                        @click="showExt = !showExt"
+                          color="orange lighten-2"
+                          text
+                          @click="showExt = !showExt;videoIdx = n-1"
                         >
                             Explore
                         </v-btn>
                         <v-spacer></v-spacer>
                         <v-btn
-                        icon
-                        @click="showExt = !showExt"
+                          icon
+                          @click="showExt = !showExt;videoIdx = n-1"
                         >
                             <v-icon>{{ showExt ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
                         </v-btn>
@@ -110,39 +124,210 @@
                         <div v-show="showExt">
                             <v-divider></v-divider>
                             <v-card-text>
-                                {{lipsum}}
+                              <v-file-input
+                                small-chips
+                                counter
+                                show-size
+                                prepend-icon="mdi-camera"
+                                label="Upload Image"
+                              ></v-file-input>
+                              <v-textarea
+                                auto-grow
+                                count
+                                outlined
+                                clearable
+                                color="deep-purple lighten-3"
+                                clear-icon="mdi-close-circle"
+                                label="Comment"
+                                ref="inputRef"
+                                v-model="commentContent"
+                              ></v-textarea>
+                              <div
+                                v-for='i in 2'
+                                :key='i'
+                                style='display: inline-block;'
+                              >
+                                <v-btn
+                                  :loading="dialog[i-1]"
+                                  text
+                                  color="deep-purple lighten-3"
+                                  @click="triggerDialog(i-1)"
+                                >
+                                  <div v-html='btnTitle[i-1]'></div>
+                                  <v-icon
+                                    right
+                                    dark
+                                  >
+                                    {{i == 1 ? 'mdi-cloud-upload' : 'mdi-comment' }}
+                                  </v-icon>
+                                  <v-dialog
+                                    v-model="dialog[i-1]"
+                                    hide-overlay
+                                    persistent
+                                    width="400"
+                                  >
+                                    <v-card
+                                      color="deep-purple lighten-2"
+                                      dark
+                                      class="pt-2"
+                                    >
+                                      <v-card-text>
+                                        <div style="color:white" v-html='btnMsg[i-1]'></div>
+                                        <v-progress-linear
+                                          indeterminate
+                                          color="white"
+                                          class="mb-0"
+                                        ></v-progress-linear>
+                                      </v-card-text>
+                                    </v-card>
+                                  </v-dialog>
+                                </v-btn>
+                                <v-snackbar
+                                  v-model="snackbar"
+                                  multi-line
+                                >
+                                  Success!
+                                  <template v-slot:action="{ attrs }">
+                                    <v-btn
+                                      color="primary lighten-2"
+                                      text
+                                      v-bind="attrs"
+                                      @click="snackbar = false"
+                                    >
+                                      Close
+                                    </v-btn>
+                                  </template>
+                                </v-snackbar>
+                              </div>
+                              <div
+                                v-for='i in 2'
+                                :key="n + '_' + i"
+                                style='display: inline-block;'
+                              >
+                                <v-btn
+                                  small
+                                  color="red lighten-3"
+                                  text
+                                  dark
+                                  @click.stop="triggerAPIDialog(i-1)"
+                                >
+                                  API
+                                </v-btn>
+                                <v-dialog
+                                  v-model="APIDialog[i-1]"
+                                  :max-width="APIDialogWidth"
+                                >
+                                  <v-card>
+                                    <v-card-title v-html="APIIntroTitle[i-1]">
+                                    </v-card-title>
+                                    <v-card-text v-html="APIIntroContent[i-1]">
+                                    </v-card-text>
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn
+                                        color="grey lighten-1"
+                                        text
+                                        @click="triggerAPIDialog(i-1)"
+                                      >
+                                        Close
+                                      </v-btn>
+                                    </v-card-actions>
+                                  </v-card>
+                                </v-dialog>
+                              </div>
                             </v-card-text>
-                            <div class='mx-0'>
-                                <iframe v-if='r==1' id="ytplayer" type="text/html" width="431" height="244"
-                                :src="introVideo[n-1]"
-                                frameborder="0"></iframe>
-                                <img
-                                    src='https://www.google.com/maps/vt/data=G9pqpSLmZPMniI-NvV4bw_Nvlo9fSeGeCpgkgTkLHEWOaUghPUqz-nHS5fXCBqKaPGDQdopkXu6mFFTW0qBUhNSYX28s6hfnyjHMs0Fut5cYE1ddF7Um9ORzc6oRPEiLWTN6QooR-aYOqcM3Gm9rrlG-XOe9JfToh6aqIp7ZWWKY9IZLPrToXVnJBU6mVMMVOFkdHkkytJQRrrqkMWytPKJ0sBl7GSiCN9YDwjy3T4Ns-vKiBNGsDLtH'
-                                    width="431" height="244"
-                                />
-                            </div>
                         </div>
                     </v-expand-transition>
                 </v-card>
             </div>
         </v-col>
+        <v-col cols='6' v-show="showExt">
+          <div class='mx-0'>
+            <iframe id="ytplayer" type="text/html" width="720" height="405"
+            :src="introVideo[videoIdx]"
+            frameborder="0"></iframe>
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn
+            small
+            color="red lighten-3"
+            text
+            dark
+            @click.stop="triggerAPIDialog(2)"
+          >
+            API
+          </v-btn>
+          <v-dialog
+            v-model="APIDialog[2]"
+            :max-width="APIDialogWidth"
+          >
+            <v-card>
+              <v-card-title v-html="APIIntroTitle[2]">
+              </v-card-title>
+              <v-card-text v-html="APIIntroContent[2]">
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey lighten-1"
+                  text
+                  @click="triggerAPIDialog(2)"
+                >
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <v-divider class="mb-2" width="720"></v-divider>
+          <div>
+            <img
+                src='https://www.google.com/maps/vt/data=G9pqpSLmZPMniI-NvV4bw_Nvlo9fSeGeCpgkgTkLHEWOaUghPUqz-nHS5fXCBqKaPGDQdopkXu6mFFTW0qBUhNSYX28s6hfnyjHMs0Fut5cYE1ddF7Um9ORzc6oRPEiLWTN6QooR-aYOqcM3Gm9rrlG-XOe9JfToh6aqIp7ZWWKY9IZLPrToXVnJBU6mVMMVOFkdHkkytJQRrrqkMWytPKJ0sBl7GSiCN9YDwjy3T4Ns-vKiBNGsDLtH'
+                width="720" height="405"
+            />
+          </div>
+          <v-spacer></v-spacer>
+          <v-btn
+            small
+            color="red lighten-3"
+            text
+            dark
+            @click.stop="triggerAPIDialog(3)"
+          >
+            API
+          </v-btn>
+          <v-dialog
+            v-model="APIDialog[3]"
+            :max-width="APIDialogWidth"
+          >
+            <v-card>
+              <v-card-title v-html="APIIntroTitle[3]">
+              </v-card-title>
+              <v-card-text v-html="APIIntroContent[3]">
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey lighten-1"
+                  text
+                  @click="triggerAPIDialog(3)"
+                >
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <v-divider class="mb-2" width="720"></v-divider>
+        </v-col>
     </v-row>
-    <v-snackbar
-    v-model="snackbar"
-    :timeout="timeout"
-    >
-        Commit an order successfully! <i>by Travel Portal</i>
-    <template v-slot:action="{ attrs }">
-        <v-btn
-        color="teal lighten-1"
-        text
-        v-bind="attrs"
-        @click="snackbar = false"
-        >
-        Close
-        </v-btn>
-    </template>
-    </v-snackbar>
+    <v-row>
+      <v-col cols='3'>
+        <v-pagination
+          v-model="showDayIdx"
+          :length="numDays"
+          @input="nextShowDay"
+        ></v-pagination>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -183,13 +368,44 @@ export default {
       color: {},
       title: {},
       content: {},
-      isShow: [false, false, false],
-      showIdx: 0,
+      isShowCard: [false, false, false],
+      showCardIdx: 0,
       loading: false,
       showExt: false,
       lastRNI: 0,
       timeout: 3000,
       snackbar: false,
+      videoIdx: 0,
+      showDayIdx: 1,
+      uploading: false,
+      commenting: false,
+      commentContent: '',
+      dialog: [false, false, false],
+      APIDialog: [false, false, false],
+      APIDialogWidth: 500,
+      btnTitle: ['upload', 'comment'],
+      btnMsg: [
+        'Uploading an image... <div class="text-right"><i>by Flickr</i></div>',
+        'Sending a comment...  <div class="text-right"><i>by Travel Portal</i></div>',
+        'Submitting an order...  <div class="text-right"><i>by Travel Portal</i></div>'
+      ],
+      snackMsg: [
+        'Upload an image successfully! <div class="text-right"><i>by Flickr</i></div>',
+        `Send a comment successfully! <div class="text-right"><i>by Travel Portal</i></div>`,
+        'Submit an order successfully! <div class="text-right"><i>by Travel Portal</i></div>'
+      ],
+      APIIntroTitle: [
+        'Introduction to Flickr',
+        'Introduction to Travel Portal',
+        'Introduction to Youtube',
+        'Introduction to Google Maps'
+      ],
+      APIIntroContent: [
+        'Here is the feature provided by <i>Flickr</i>.',
+        'Here is the feature provided by <i>Travel Portal</i>.',
+        'Here is the feature provided by <i>Youtube</i>.',
+        'Here is the feature provided by <i>Google Maps</i>.'
+      ],
       introVideo: [
         'https://www.youtube.com/embed/MkAzZOjgM5k',
         'https://www.youtube.com/embed/CKnGXZxK7zs',
@@ -213,52 +429,70 @@ export default {
       random = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[random]] = [arr[random], arr[i]]
     }
+    this.numDays = parseInt(this.$route.params.numDays)
+    if (isNaN(this.numDays)) {
+      this.numDays = 4
+    }
+    this.isShowDay = Array(this.numDays).fill(false)
+    this.isShowDay[0] = true
   },
   methods: {
-    reserve () {
-      this.loading = true
+    triggerDialog (i) {
+      this.$set(this.dialog, i, true)
       let that = this
       setTimeout(() => {
-        that.loading = false
+        that.$set(that.dialog, i, false)
         that.snackbar = true
-      }, 2000)
+        that.commentContent = ''
+      }, 3000)
     },
-    nextIntro (r, n, i) {
-      if (this.isShow[this.showIdx] === true) {
-        this.$set(this.isShow, this.showIdx, false)
+    triggerAPIDialog (i) {
+      this.$set(this.APIDialog, i, !this.APIDialog[i])
+    },
+    nextShowDay () {
+      for (let i = 0; i < this.isShowDay.length; i++) {
+        this.$set(this.isShowDay, i, false)
+      }
+      this.$set(this.isShowDay, this.showDayIdx - 1, true)
+    },
+    nextIntro (n, i) {
+      if (this.isShowCard[this.showCardIdx] === true) {
+        this.$set(this.isShowCard, this.showCardIdx, false)
+        this.showExt = false
       } else {
-        if (this.lastRNI !== r * 10 * 10 + n * 10 + i) {
-          this.showIdx = (this.showIdx + 1) % this.introVideo.length
+        if (this.lastRNI !== n * 10 + i) {
+          this.showCardIdx = (this.showCardIdx + 1) % this.introVideo.length
         }
-        this.$set(this.isShow, this.showIdx, true)
-        this.lastRNI = r * 10 * 10 + n * 10 + i
+        this.$set(this.isShowCard, this.showCardIdx, true)
+        this.lastRNI = n * 10 + i
       }
     },
-    getRandomTitle (row, col, item) {
-      if (!(row * col in this.title)) {
-        this.title[row * col] = []
-        var arr = this.lipsum.split(' ')
-        for (var j = 0; j < 10; j++) {
-          var shuffled = arr.slice(0)
-          var i = arr.length
-          var min = i - 2
-          var temp
-          var index
+    getRandomContent (key, item, type) {
+      let arr = (type === 'title') ? this.title : this.content
+      if (!(key in arr)) {
+        arr[key] = []
+        let arrLipsum = this.lipsum.split(' ')
+        for (let j = 0; j < 10; j++) {
+          let shuffled = arrLipsum.slice(0)
+          let i = arrLipsum.length
+          let min = i - (type === 'title' ? 2 : (5 + Math.floor((3 + 1) * Math.random())))
+          let temp
+          let index
           while (i-- > min) {
             index = Math.floor((i + 1) * Math.random())
             temp = shuffled[index]
             shuffled[index] = shuffled[i]
             shuffled[i] = temp
           }
-          this.title[row * col].push(shuffled.slice(min).join(' '))
+          arr[key].push(shuffled.slice(min).join(' '))
         }
       }
-      return this.title[row * col][item]
+      return arr[key][item]
     },
-    getRandomContent (row, col, item) {
-      if (!(row * col in this.content)) {
-        this.content[row * col] = []
-        var arr = this.lipsum.split(' ')
+    getRandomContent1 (key, item) {
+      if (!(key in this.content)) {
+        this.content[key] = []
+        let arr = this.lipsum.split(' ')
         for (var j = 0; j < 10; j++) {
           var shuffled = arr.slice(0)
           var i = arr.length
@@ -271,49 +505,31 @@ export default {
             shuffled[index] = shuffled[i]
             shuffled[i] = temp
           }
-          this.content[row * col].push(shuffled.slice(min).join(' '))
+          this.content[key].push(shuffled.slice(min).join(' '))
         }
       }
-      return this.content[row * col][item]
+      return this.content[key][item]
     },
-    getTime (row, n, i, r) {
-      if (!(row * n in this.time)) {
+    getTime (n, i, r) {
+      if (!(n in this.time)) {
         var seq = this.getRandomArrayElements([...Array(this.timeSequence.length).keys()], r + 1)
         seq.sort()
-        this.time[row * n] = []
+        this.time[n] = []
         for (var idx of seq) {
-          this.time[row * n].push(this.timeSequence[idx])
+          this.time[n].push(this.timeSequence[idx])
         }
       }
-      return this.time[row * n][i]
+      return this.time[n][i]
     },
-    getDayRow () {
-      let numDays = parseInt(this.$route.params.numDays)
-      if (isNaN(numDays)) {
-        numDays = 4
-      }
-      return parseInt((numDays + 1) / 2)
-    },
-    getDayCol (r) {
-      let numDays = parseInt(this.$route.params.numDays)
-      if (isNaN(numDays)) {
-        numDays = 4
-      }
-      if ((numDays % 2) === 1 && r === this.getDayRow()) {
-        return 1
-      } else {
-        return 2
-      }
-    },
-    getTimelineColor (r, n, i) {
-      if (!(r * n in this.color)) {
-        this.color[r * n] = []
+    getTimelineColor (n, i) {
+      if (!(n in this.color)) {
+        this.color[n] = []
         for (var temp = 0; temp < 10; temp++) {
           var index = Math.floor((this.timelineColor.length + 1) * Math.random())
-          this.color[r * n].push(this.timelineColor[index])
+          this.color[n].push(this.timelineColor[index])
         }
       }
-      return this.color[r * n][i]
+      return this.color[n][i]
     },
     getGradient (hover) {
       if (hover === true) {
@@ -323,11 +539,11 @@ export default {
       }
     },
     getRandomArrayElements (arr, count) {
-      var shuffled = arr.slice(0)
-      var i = arr.length
-      var min = i - count
-      var temp
-      var index
+      let shuffled = arr.slice(0)
+      let i = arr.length
+      let min = i - count
+      let temp
+      let index
       while (i-- > min) {
         index = Math.floor((i + 1) * Math.random())
         temp = shuffled[index]
@@ -335,18 +551,6 @@ export default {
         shuffled[i] = temp
       }
       return shuffled.slice(min)
-    },
-    jump () {
-      this.getProgress()
-      if (this.progressVal === 100) {
-        this.overlay = !this.overlay
-        var that = this
-        setTimeout(function () {
-          that.$router.push({ path: '/Result' })
-        }, 2500)
-      } else {
-        this.snackbar = true
-      }
     }
   }
 }
