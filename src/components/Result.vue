@@ -242,7 +242,7 @@
             </div>
         </v-col>
         <v-col cols='6' v-show="showExt">
-          <div class='mx-0'>
+          <div class='mx-0' style="width: 720px; height: 405px; border-radius: 5px; overflow: hidden;">
             <iframe id="ytplayer" type="text/html" width="720" height="405"
             :src="introVideo[videoIdx]"
             frameborder="0"></iframe>
@@ -279,7 +279,7 @@
             </v-card>
           </v-dialog>
           <v-divider class="mb-2" width="720"></v-divider>
-          <div>
+          <div style="width: 720px; height: 405px; border-radius: 5px; overflow: hidden;">
             <img
                 src='https://www.google.com/maps/vt/data=G9pqpSLmZPMniI-NvV4bw_Nvlo9fSeGeCpgkgTkLHEWOaUghPUqz-nHS5fXCBqKaPGDQdopkXu6mFFTW0qBUhNSYX28s6hfnyjHMs0Fut5cYE1ddF7Um9ORzc6oRPEiLWTN6QooR-aYOqcM3Gm9rrlG-XOe9JfToh6aqIp7ZWWKY9IZLPrToXVnJBU6mVMMVOFkdHkkytJQRrrqkMWytPKJ0sBl7GSiCN9YDwjy3T4Ns-vKiBNGsDLtH'
                 width="720" height="405"
