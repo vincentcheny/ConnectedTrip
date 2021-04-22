@@ -7,7 +7,7 @@
                 <v-card>
                     <v-img
                     class="white--text align-end"
-                    :src='cardImg[n % cardImg.length]'
+                    :src='dayImg[n % dayImg.length]'
                     :gradient='getGradient(hover)'
                     height='250'
                     >
@@ -44,12 +44,12 @@
                       show-arrows-on-hover
                     >
                       <v-carousel-item
-                        v-for="i in cardImg.length"
+                        v-for="i in spotImg.length"
                         :key="i"
                       >
                         <v-img
                           height="100%"
-                          :src="cardImg[i-1]"
+                          :src="spotImg[i-1]"
                         ></v-img>
                       </v-carousel-item>
                     </v-carousel>
@@ -353,14 +353,22 @@ export default {
   name: 'searchbar',
   data () {
     return {
-      cardImg: [
+      dayImg: [
+        'https://cdn.hk01.com/di/media/images/3101093/org/47725f74fd618c6052642b7364a66e77.jpg/qypPM52Jx9_EYeBgY9I8mUWWYLNRforI1ki6zNZIusw?v=w1280r16_9',
         'https://images.pexels.com/photos/1294671/pexels-photo-1294671.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
-        'https://images.pexels.com/photos/830891/pexels-photo-830891.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
-        'https://images.pexels.com/photos/747964/pexels-photo-747964.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
         'https://images.pexels.com/photos/994605/pexels-photo-994605.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500',
         'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
-        'https://cdn.vuetifyjs.com/images/cards/forest.jpg',
-        'https://cdn.vuetifyjs.com/images/cards/house.jpg'
+        'https://imgs.weekendhk.com/wp-content/uploads/2018/08/45534_16817424375b73ea3a6436e.jpg',
+        'https://cdn.vuetifyjs.com/images/cards/forest.jpg'
+      ],
+      spotImg: [
+        'https://hk.ulifestyle.com.hk/cms/images/event/1024x576/202011/20201118104629_0_117174922-124169279259736-7310874667812656124-o.jpg',
+        'https://handstopmouthstop.com/wp-content/uploads/2020/11/20190605175507_1_18836730-1972893049622465-2448443069993660181-o.jpg',
+        'https://lh3.googleusercontent.com/proxy/agyULM7Zd8gM8mRQTc8BeJ4qoh3iRs-B2NuloOeGU7W4B1H6Qim-MCQVDubjTkSc8JOEblMpEqwIZ0MLMpWnWYhwd3aF1KKfgPxrtBC6tpnhhjPnug',
+        'https://cdn2.ettoday.net/images/3771/d3771782.jpg',
+        'https://content.shopback.com/tw/wp-content/uploads/2020/07/22112930/1%E9%9B%B2%E6%9E%97%E6%95%85%E4%BA%8B%E9%A4%A8_aymi7e-1.jpg',
+        'https://img-fnc.ebc.net.tw/EbcFnc/news/2019/05/02/1556815107_54570.jpg',
+        'https://pgw.udn.com.tw/gw/photo.php?u=https://uc.udn.com.tw/photo/2020/12/29/1/10284271.jpg&x=0&y=0&sw=0&sh=0&sl=W&fw=1050'
       ],
       timelineColor: [
         'blue',
@@ -440,11 +448,16 @@ export default {
     }
   },
   created: function () {
-    let arr = this.cardImg
+    let dayArr = this.dayImg
     let random
-    for (let i = 1; i < arr.length; i++) {
+    for (let i = 1; i < dayArr.length; i++) {
       random = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[random]] = [arr[random], arr[i]]
+      [dayArr[i], dayArr[random]] = [dayArr[random], dayArr[i]]
+    }
+    let spotArr = this.spotImg
+    for (let i = 3; i < spotArr.length; i++) {
+      random = Math.floor(Math.random() * (i + 1));
+      [spotArr[i], spotArr[random]] = [spotArr[random], spotArr[i]]
     }
     this.numDays = parseInt(this.$route.params.numDays)
     if (isNaN(this.numDays)) {
