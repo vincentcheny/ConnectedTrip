@@ -37,10 +37,22 @@
                 <v-card
                 :loading="loading"
                 >
-                    <v-img
-                        height="250"
-                        :src="cardImg[n]"
-                    ></v-img>
+                    <v-carousel
+                      cycle
+                      height="250"
+                      hide-delimiter-background
+                      show-arrows-on-hover
+                    >
+                      <v-carousel-item
+                        v-for="i in cardImg.length"
+                        :key="i"
+                      >
+                        <v-img
+                          height="100%"
+                          :src="cardImg[i-1]"
+                        ></v-img>
+                      </v-carousel-item>
+                    </v-carousel>
                     <v-card-title v-text='getRandomContent(0, n, "title")'></v-card-title>
                     <v-card-text>
                         <v-row
@@ -258,9 +270,12 @@
             API
           </v-btn>
           <v-dialog
+            v-for='i in 3'
+            :key='i'
             v-model="APIDialog[2]"
             :max-width="APIDialogWidth"
           >
+            <!-- three times of mask layers -->
             <v-card>
               <v-card-title v-html="APIIntroTitle[2]">
               </v-card-title>
@@ -296,6 +311,8 @@
             API
           </v-btn>
           <v-dialog
+            v-for='i in 3'
+            :key='i'
             v-model="APIDialog[3]"
             :max-width="APIDialogWidth"
           >
@@ -386,23 +403,23 @@ export default {
       btnTitle: ['upload', 'comment'],
       btnMsg: [
         'Uploading an image... <div class="text-right"><i>by Flickr</i></div>',
-        'Sending a comment...  <div class="text-right"><i>by Travel Portal</i></div>',
-        'Submitting an order...  <div class="text-right"><i>by Travel Portal</i></div>'
+        'Sending a comment...  <div class="text-right"><i>by Connected Trip</i></div>',
+        'Submitting an order...  <div class="text-right"><i>by Fliggy</i></div>'
       ],
       snackMsg: [
         'Upload an image successfully! <div class="text-right"><i>by Flickr</i></div>',
-        `Send a comment successfully! <div class="text-right"><i>by Travel Portal</i></div>`,
-        'Submit an order successfully! <div class="text-right"><i>by Travel Portal</i></div>'
+        `Send a comment successfully! <div class="text-right"><i>by Connected Trip</i></div>`,
+        'Submit an order successfully! <div class="text-right"><i>by Fliggy</i></div>'
       ],
       APIIntroTitle: [
         'Introduction to Flickr',
-        'Introduction to Travel Portal',
+        'Introduction to Fliggy',
         'Introduction to Youtube',
         'Introduction to Google Maps'
       ],
       APIIntroContent: [
         'Here is the feature provided by <i>Flickr</i>.',
-        'Here is the feature provided by <i>Travel Portal</i>.',
+        'Here is the feature provided by <i>Fliggy</i>.',
         'Here is the feature provided by <i>Youtube</i>.',
         'Here is the feature provided by <i>Google Maps</i>.'
       ],
