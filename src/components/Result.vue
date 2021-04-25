@@ -155,7 +155,7 @@
                                 v-model="commentContent"
                               ></v-textarea>
                               <div
-                                v-for='i in 2'
+                                v-for='i in 1'
                                 :key='i'
                                 style='display: inline-block;'
                               >
@@ -222,6 +222,7 @@
                                   text
                                   dark
                                   @click.stop="triggerAPIDialog(i-1)"
+                                  v-show="false"
                                 >
                                   API
                                 </v-btn>
@@ -266,6 +267,7 @@
             text
             dark
             @click.stop="triggerAPIDialog(2)"
+            v-show="false"
           >
             API
           </v-btn>
@@ -307,6 +309,7 @@
             text
             dark
             @click.stop="triggerAPIDialog(3)"
+            v-show="false"
           >
             API
           </v-btn>
@@ -364,7 +367,6 @@ export default {
       spotImg: [
         'https://hk.ulifestyle.com.hk/cms/images/event/1024x576/202011/20201118104629_0_117174922-124169279259736-7310874667812656124-o.jpg',
         'https://handstopmouthstop.com/wp-content/uploads/2020/11/20190605175507_1_18836730-1972893049622465-2448443069993660181-o.jpg',
-        'https://lh3.googleusercontent.com/proxy/agyULM7Zd8gM8mRQTc8BeJ4qoh3iRs-B2NuloOeGU7W4B1H6Qim-MCQVDubjTkSc8JOEblMpEqwIZ0MLMpWnWYhwd3aF1KKfgPxrtBC6tpnhhjPnug',
         'https://cdn2.ettoday.net/images/3771/d3771782.jpg',
         'https://content.shopback.com/tw/wp-content/uploads/2020/07/22112930/1%E9%9B%B2%E6%9E%97%E6%95%85%E4%BA%8B%E9%A4%A8_aymi7e-1.jpg',
         'https://img-fnc.ebc.net.tw/EbcFnc/news/2019/05/02/1556815107_54570.jpg',
@@ -387,6 +389,7 @@ export default {
         '7pm',
         '8-9pm'
       ],
+      showAPIBtn: false,
       rating: [3.5, 4.5, 5],
       numComments: [412, 5938, 820],
       time: {},
@@ -408,7 +411,7 @@ export default {
       dialog: [false, false, false],
       APIDialog: [false, false, false],
       APIDialogWidth: 500,
-      btnTitle: ['upload', 'comment'],
+      btnTitle: ['submit', 'comment'],
       btnMsg: [
         'Uploading an image... <div class="text-right"><i>by Flickr</i></div>',
         'Sending a comment...  <div class="text-right"><i>by Connected Trip</i></div>',
@@ -432,9 +435,7 @@ export default {
         'Here is the feature provided by <i>Google Maps</i>.'
       ],
       introVideo: [
-        'https://www.youtube.com/embed/MkAzZOjgM5k',
-        'https://www.youtube.com/embed/CKnGXZxK7zs',
-        'https://www.youtube.com/embed/DyBSGdwIIoA'
+        'https://www.youtube.com/embed/Zw_tJOwZmac'
       ],
       lipsum: 'Vis ea hinc tamquam Ius id denique Nec meliore ocurreret te maiorum tacimates qualisque ius te eos te adhuc delenit Ne pri primis facilis deseruisse Eos assum soleat ei nominavi deleniti legendos per ne Aperiri dolorum deleniti cum ea munere graecis et quo vero nemore ne mel'
     }
@@ -454,11 +455,11 @@ export default {
       random = Math.floor(Math.random() * (i + 1));
       [dayArr[i], dayArr[random]] = [dayArr[random], dayArr[i]]
     }
-    let spotArr = this.spotImg
-    for (let i = 3; i < spotArr.length; i++) {
-      random = Math.floor(Math.random() * (i + 1));
-      [spotArr[i], spotArr[random]] = [spotArr[random], spotArr[i]]
-    }
+    // let spotArr = this.spotImg
+    // for (let i = 0; i < spotArr.length; i++) {
+    //   random = Math.floor(Math.random() * (i + 1));
+    //   [spotArr[i], spotArr[random]] = [spotArr[random], spotArr[i]]
+    // }
     this.numDays = parseInt(this.$route.params.numDays)
     if (isNaN(this.numDays)) {
       this.numDays = 4

@@ -106,7 +106,7 @@
             </v-card-text>
             <v-col>
               <v-row>
-                <v-col class="my-n5" cols="11">
+                <v-col class="my-n5" cols="11" style="{border-style:solid; border-width:5px}">
                   <v-text-field
                     label="Other requirements"
                   ></v-text-field>
@@ -118,6 +118,7 @@
                     text
                     dark
                     @click.stop="APIDialog = true"
+                    v-show="false"
                   >
                     API
                   </v-btn>
@@ -275,7 +276,7 @@ export default {
         {
           index: 3,
           name: "Room types",
-          itemList: ["Single", "En suite", "Twin", "Barbecue", "Studio"],
+          itemList: ["Single", "En suite", "Twin", "Studio"],
           isMultiple: false,
           isChipGroup: true
         },
@@ -299,7 +300,14 @@ export default {
       APIDialog: false,
       APIDialogWidth: 500,
       APIIntroTitle: 'Introduction to Yonder Keyword Extraction',
-      APIIntroContent: 'Here is the feature provided by <i>Yonder Keyword Extraction</i>.',
+      APIIntroContent: '\
+        Here is the featur\
+        <ul>\
+        <li>Coffee</li>\
+        <li>Milk</li>\
+        </ul>\
+        e prov<br>ided by <i>Yonder Keyword Extraction</i>.\
+        ',
       cardImg: [
         'https://cdn.vuetifyjs.com/images/cards/docks.jpg',
         'https://cdn.vuetifyjs.com/images/cards/cooking.png',
