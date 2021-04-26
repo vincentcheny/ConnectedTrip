@@ -415,22 +415,22 @@ export default {
       btnMsg: [
         'Uploading an image... <div class="text-right"><i>by Flickr</i></div>',
         'Sending a comment...  <div class="text-right"><i>by Connected Trip</i></div>',
-        'Submitting an order...  <div class="text-right"><i>by Fliggy</i></div>'
+        'Submitting an order...  <div class="text-right"><i>by Alitrip</i></div>'
       ],
       snackMsg: [
         'Upload an image successfully! <div class="text-right"><i>by Flickr</i></div>',
         `Send a comment successfully! <div class="text-right"><i>by Connected Trip</i></div>`,
-        'Submit an order successfully! <div class="text-right"><i>by Fliggy</i></div>'
+        'Submit an order successfully! <div class="text-right"><i>by Alitrip</i></div>'
       ],
       APIIntroTitle: [
         'Introduction to Flickr',
-        'Introduction to Fliggy',
+        'Introduction to Alitrip',
         'Introduction to Youtube',
         'Introduction to Google Maps'
       ],
       APIIntroContent: [
         'Here is the feature provided by <i>Flickr</i>.',
-        'Here is the feature provided by <i>Fliggy</i>.',
+        'Here is the feature provided by <i>Alitrip</i>.',
         'Here is the feature provided by <i>Youtube</i>.',
         'Here is the feature provided by <i>Google Maps</i>.'
       ],
